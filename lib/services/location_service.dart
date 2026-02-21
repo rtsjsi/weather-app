@@ -39,9 +39,7 @@ class LocationService {
           'Location permission denied. Please enable in settings.');
     }
     final position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.medium,
-      ),
+      desiredAccuracy: LocationAccuracy.medium,
     );
     return LocationModel(
       latitude: position.latitude,
