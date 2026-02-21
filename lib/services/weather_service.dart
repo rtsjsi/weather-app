@@ -43,7 +43,6 @@ class WeatherService {
           'wind_speed_10m',
         ].join(','),
         'daily': [
-          'time',
           'weather_code',
           'temperature_2m_max',
           'temperature_2m_min',
