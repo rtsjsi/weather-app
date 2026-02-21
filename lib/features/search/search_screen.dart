@@ -60,13 +60,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _selectLocation(LocationModel location) async {
     await context.read<WeatherProvider>().loadWeatherForLocation(location);
-    if (mounted) {
-      Navigator.pop(context, location.displayName);
-    }
+    if (mounted) Navigator.pop(context, location.displayName);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search city'),
@@ -76,17 +76,16 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
             child: TextField(
               controller: _searchController,
+              autofocus: true,
               decoration: InputDecoration(
-                hintText: 'Enter city name...',
+                hintText: 'Enter city or place name…',
                 prefixIcon: const Icon(Icons.search_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear_rounded),
@@ -113,56 +112,125 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           if (_searchError != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 _searchError!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ),
-          if (_isSearching)
-            const Expanded(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (_results.isEmpty && _searchController.text.isNotEmpty)
-            Expanded(
-              child: Center(
-                child: Text(
-                  'No results found',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ),
-            )
-          else if (_results.isEmpty)
-            Expanded(
-              child: Center(
-                child: Text(
-                  'Search for a city to see weather',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ),
-            )
-          else
-            Expanded(
-              child: ListView.builder(
-                itemCount: _results.length,
-                itemBuilder: (context, index) {
-                  final location = _results[index];
-                  return ListTile(
-                    leading: const Icon(Icons.location_city_rounded),
-                    title: Text(location.displayName),
-                    subtitle: Text(
-                      '${location.latitude.toStringAsFixed(2)}, ${location.longitude.toStringAsFixed(2)}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
                     ),
-                    onTap: () => _selectLocation(location),
-                  );
-                },
               ),
             ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: _isSearching
+                ? const Center(child: CircularProgressIndicator())
+                : _results.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.location_city_rounded,
+                                size: 64,
+                                color: theme.colorScheme.outline.withOpacity(0.6),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _searchController.text.isEmpty
+                                    ? 'Search for a city to see weather'
+                                    : 'No results found',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        itemCount: _results.length,
+                        itemBuilder: (context, index) {
+                          final location = _results[index];
+                          return _SearchResultCard(
+                            location: location,
+                            onTap: () => _selectLocation(location),
+                          );
+                        },
+                      ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _SearchResultCard extends StatelessWidget {
+  final LocationModel location;
+  final VoidCallback onTap;
+
+  const _SearchResultCard({required this.location, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.place_rounded,
+                    color: theme.colorScheme.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        location.displayName,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${location.latitude.toStringAsFixed(2)}°, ${location.longitude.toStringAsFixed(2)}°',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
