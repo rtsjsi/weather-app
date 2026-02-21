@@ -1,13 +1,8 @@
-/// App configuration and constants.
-/// Set API key via: flutter run --dart-define=WEATHER_API_KEY=your_key
+/// App configuration. Weather data from Open-Meteo (no API key).
 class AppConfig {
   static const String appName = 'Weather';
 
-  static const String weatherApiBaseUrl =
-      'https://api.openweathermap.org/data/2.5';
-
-  static String get apiKey {
-    const key = String.fromEnvironment('WEATHER_API_KEY', defaultValue: '');
-    return key;
-  }
+  static const String forecastBaseUrl = 'https://api.open-meteo.com/v1';
+  static const String geocodingBaseUrl =
+      'https://geocoding-api.open-meteo.com/v1';
 }

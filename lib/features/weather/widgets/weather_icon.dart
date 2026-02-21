@@ -1,33 +1,14 @@
+/// Map Open-Meteo WMO weather code (as string) to emoji.
 String weatherIconFromCode(String code) {
-  switch (code) {
-    case '01d':
-    case '01n':
-      return '☀️';
-    case '02d':
-    case '02n':
-      return '⛅';
-    case '03d':
-    case '03n':
-      return '☁️';
-    case '04d':
-    case '04n':
-      return '☁️';
-    case '09d':
-    case '09n':
-      return '🌧️';
-    case '10d':
-    case '10n':
-      return '🌦️';
-    case '11d':
-    case '11n':
-      return '⛈️';
-    case '13d':
-    case '13n':
-      return '❄️';
-    case '50d':
-    case '50n':
-      return '🌫️';
-    default:
-      return '🌡️';
-  }
+  final c = int.tryParse(code) ?? 0;
+  if (c == 0) return '☀️';
+  if (c >= 1 && c <= 3) return '⛅';
+  if (c == 45 || c == 48) return '🌫️';
+  if (c >= 51 && c <= 57) return '🌧️';
+  if (c >= 61 && c <= 67) return '🌧️';
+  if (c >= 71 && c <= 77) return '❄️';
+  if (c >= 80 && c <= 82) return '🌦️';
+  if (c >= 85 && c <= 86) return '❄️';
+  if (c >= 95 && c <= 99) return '⛈️';
+  return '☁️';
 }

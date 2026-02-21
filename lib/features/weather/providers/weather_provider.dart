@@ -15,20 +15,16 @@ class WeatherProvider extends ChangeNotifier {
   final GeocodingService _geocodingService = GeocodingService();
 
   WeatherStatus _status = WeatherStatus.initial;
-  WeatherStatus get status => _status;
-
   WeatherModel? _weather;
-  WeatherModel? get weather => _weather;
-
   List<ForecastModel> _forecast = [];
-  List<ForecastModel> get forecast => _forecast;
-
   LocationModel? _currentLocation;
-  LocationModel? get currentLocation => _currentLocation;
-
   String? _errorMessage;
-  String? get errorMessage => _errorMessage;
 
+  WeatherStatus get status => _status;
+  WeatherModel? get weather => _weather;
+  List<ForecastModel> get forecast => _forecast;
+  LocationModel? get currentLocation => _currentLocation;
+  String? get errorMessage => _errorMessage;
   bool get isLoading => _status == WeatherStatus.loading;
   bool get hasError => _status == WeatherStatus.error;
   bool get hasData => _weather != null;
@@ -71,8 +67,7 @@ class WeatherProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     try {
-      final location =
-          await _geocodingService.getLocationFromPlace(cityName);
+      final location = await _geocodingService.getLocationFromPlace(cityName);
       if (location == null) {
         throw WeatherServiceException('City not found: $cityName');
       }
@@ -88,30 +83,45 @@ class WeatherProvider extends ChangeNotifier {
   }
 
   Future<void> _loadWeatherForLocation(LocationModel location) async {
-    final weather = await _weatherService.getCurrentWeather(
+    final cityName = location.cityName ?? '';
+    final countryCode = location.countryCode ?? '';
+
+    final result = await _weatherService.getWeatherAndForecast(
       location.latitude,
       location.longitude,
+      cityName: cityName,
+      countryCode: countryCode,
     );
-    final forecastList = await _weatherService.getForecast(
-      location.latitude,
-      location.longitude,
-    );
-    String? cityDisplay = weather.cityName;
-    if (cityDisplay.isEmpty) {
-      cityDisplay = await _geocodingService.getCityName(
+
+    String displayCity = result.weather.cityName;
+    if (displayCity.isEmpty) {
+      displayCity = await _geocodingService.getCityName(
         location.latitude,
         location.longitude,
       );
     }
+
     _currentLocation = LocationModel(
       latitude: location.latitude,
       longitude: location.longitude,
-      cityName: cityDisplay,
-      countryCode:
-          weather.countryCode.isNotEmpty ? weather.countryCode : null,
+      cityName: displayCity.isEmpty ? null : displayCity,
+      countryCode: result.weather.countryCode.isNotEmpty
+          ? result.weather.countryCode
+          : null,
     );
-    _weather = weather;
-    _forecast = forecastList;
+    _weather = WeatherModel(
+      temperature: result.weather.temperature,
+      feelsLike: result.weather.feelsLike,
+      humidity: result.weather.humidity,
+      windSpeed: result.weather.windSpeed,
+      description: result.weather.description,
+      iconCode: result.weather.iconCode,
+      cityName: displayCity,
+      countryCode: result.weather.countryCode.isNotEmpty
+          ? result.weather.countryCode
+          : countryCode,
+    );
+    _forecast = result.forecast;
     _status = WeatherStatus.loaded;
     _errorMessage = null;
     notifyListeners();
