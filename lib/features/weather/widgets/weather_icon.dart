@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-
-/// Maps OpenWeatherMap icon codes to Material icons or emoji
 String weatherIconFromCode(String code) {
   switch (code) {
     case '01d':

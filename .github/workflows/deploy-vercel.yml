@@ -1,0 +1,40 @@
+# Build Flutter web and deploy to Vercel on push to main.
+# Repo secrets: WEATHER_API_KEY, VERCEL_TOKEN. Optional: VERCEL_ORG_ID, VERCEL_PROJECT_ID (from one manual deploy).
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.x"
+          channel: "stable"
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build web
+        run: flutter build web --release --dart-define=WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Link Vercel project (optional; omit if first deploy)
+        if: ${{ secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+        run: |
+          mkdir -p build/web/.vercel
+          echo '{"orgId":"${{ secrets.VERCEL_ORG_ID }}","projectId":"${{ secrets.VERCEL_PROJECT_ID }}"}' > build/web/.vercel/project.json
+
+      - name: Deploy to Vercel
+        run: |
+          cd build/web
+          vercel deploy --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes

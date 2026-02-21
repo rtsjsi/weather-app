@@ -33,52 +33,54 @@ class WeatherProvider extends ChangeNotifier {
   bool get hasError => _status == WeatherStatus.error;
   bool get hasData => _weather != null;
 
-  /// Load weather for device's current location
   Future<void> loadWeatherForCurrentLocation() async {
     _status = WeatherStatus.loading;
     _errorMessage = null;
     notifyListeners();
-
     try {
       final location = await _locationService.getCurrentPosition();
       await _loadWeatherForLocation(location);
     } catch (e) {
       _status = WeatherStatus.error;
-      _errorMessage = e.toString().replaceFirst('LocationServiceException: ', '');
+      _errorMessage =
+          e.toString().replaceFirst('LocationServiceException: ', '');
       notifyListeners();
     }
   }
 
-  /// Load weather for a specific location (e.g. from search)
   Future<void> loadWeatherForLocation(LocationModel location) async {
     _status = WeatherStatus.loading;
     _errorMessage = null;
     notifyListeners();
-
     try {
       await _loadWeatherForLocation(location);
+    } on WeatherServiceException catch (e) {
+      _status = WeatherStatus.error;
+      _errorMessage = e.message;
+      notifyListeners();
     } catch (e) {
       _status = WeatherStatus.error;
-      _errorMessage = e.toString().replaceFirst('WeatherServiceException: ', '');
+      _errorMessage =
+          e.toString().replaceFirst('WeatherServiceException: ', '');
       notifyListeners();
     }
   }
 
-  /// Load weather by city name (from search)
   Future<void> loadWeatherByCity(String cityName) async {
     _status = WeatherStatus.loading;
     _errorMessage = null;
     notifyListeners();
-
     try {
-      final location = await _geocodingService.getLocationFromPlace(cityName);
+      final location =
+          await _geocodingService.getLocationFromPlace(cityName);
       if (location == null) {
         throw WeatherServiceException('City not found: $cityName');
       }
       await _loadWeatherForLocation(location);
     } catch (e) {
       _status = WeatherStatus.error;
-      _errorMessage = e.toString()
+      _errorMessage = e
+          .toString()
           .replaceFirst('WeatherServiceException: ', '')
           .replaceFirst('Exception: ', '');
       notifyListeners();
@@ -94,7 +96,6 @@ class WeatherProvider extends ChangeNotifier {
       location.latitude,
       location.longitude,
     );
-
     String? cityDisplay = weather.cityName;
     if (cityDisplay.isEmpty) {
       cityDisplay = await _geocodingService.getCityName(
@@ -102,12 +103,12 @@ class WeatherProvider extends ChangeNotifier {
         location.longitude,
       );
     }
-
     _currentLocation = LocationModel(
       latitude: location.latitude,
       longitude: location.longitude,
       cityName: cityDisplay,
-      countryCode: weather.countryCode.isNotEmpty ? weather.countryCode : null,
+      countryCode:
+          weather.countryCode.isNotEmpty ? weather.countryCode : null,
     );
     _weather = weather;
     _forecast = forecastList;
@@ -116,7 +117,6 @@ class WeatherProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Refresh current weather
   Future<void> refresh() async {
     if (_currentLocation != null) {
       await loadWeatherForLocation(_currentLocation!);
@@ -125,7 +125,6 @@ class WeatherProvider extends ChangeNotifier {
     }
   }
 
-  /// Reset to initial state
   void reset() {
     _status = WeatherStatus.initial;
     _weather = null;

@@ -1,17 +1,13 @@
 /// App configuration and constants.
-/// API key is passed via --dart-define=WEATHER_API_KEY=xxx at build/run time.
+/// Set API key via: flutter run --dart-define=WEATHER_API_KEY=your_key
 class AppConfig {
-  static const String appName = 'Weather App';
+  static const String appName = 'Weather';
 
-  /// OpenWeatherMap API base URL
-  static const String weatherApiBaseUrl = 'https://api.openweathermap.org/data/2.5';
+  static const String weatherApiBaseUrl =
+      'https://api.openweathermap.org/data/2.5';
 
-  /// Get API key from compile-time define. Fallback for development only.
   static String get apiKey {
-    const key = String.fromEnvironment(
-      'WEATHER_API_KEY',
-      defaultValue: '',
-    );
+    const key = String.fromEnvironment('WEATHER_API_KEY', defaultValue: '');
     return key;
   }
 }

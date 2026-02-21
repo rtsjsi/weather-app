@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'core/theme/app_theme.dart';
 import 'features/weather/providers/weather_provider.dart';
 import 'features/weather/weather_screen.dart';
@@ -12,7 +13,7 @@ class WeatherApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => WeatherProvider(),
       child: MaterialApp(
-        title: 'Weather App',
+        title: 'Weather',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,

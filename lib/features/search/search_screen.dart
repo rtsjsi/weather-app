@@ -39,12 +39,10 @@ class _SearchScreenState extends State<SearchScreen> {
       });
       return;
     }
-
     setState(() {
       _isSearching = true;
       _searchError = null;
     });
-
     try {
       final results = await _geocodingService.searchByCityName(query);
       setState(() {
@@ -71,9 +69,9 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Search City'),
+        title: const Text('Search city'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -85,13 +83,13 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Enter city name...',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search_rounded),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: const Icon(Icons.clear_rounded),
                         onPressed: () {
                           _searchController.clear();
                           setState(() {
@@ -154,7 +152,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (context, index) {
                   final location = _results[index];
                   return ListTile(
-                    leading: const Icon(Icons.location_city),
+                    leading: const Icon(Icons.location_city_rounded),
                     title: Text(location.displayName),
                     subtitle: Text(
                       '${location.latitude.toStringAsFixed(2)}, ${location.longitude.toStringAsFixed(2)}',

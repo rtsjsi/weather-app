@@ -1,4 +1,3 @@
-/// Location for weather lookup (lat/lon or city name)
 class LocationModel {
   final double latitude;
   final double longitude;

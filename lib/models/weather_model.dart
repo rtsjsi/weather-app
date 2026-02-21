@@ -1,4 +1,3 @@
-/// Current weather data from OpenWeatherMap API
 class WeatherModel {
   final double temperature;
   final double feelsLike;
@@ -22,7 +21,8 @@ class WeatherModel {
 
   factory WeatherModel.fromJson(Map<String, dynamic> json) {
     final main = json['main'] as Map<String, dynamic>? ?? {};
-    final weather = (json['weather'] as List<dynamic>?)?[0] as Map<String, dynamic>? ?? {};
+    final weather =
+        (json['weather'] as List<dynamic>?)?[0] as Map<String, dynamic>? ?? {};
     final wind = json['wind'] as Map<String, dynamic>? ?? {};
 
     return WeatherModel(
@@ -33,7 +33,8 @@ class WeatherModel {
       description: (weather['description'] as String?) ?? '',
       iconCode: (weather['icon'] as String?) ?? '01d',
       cityName: (json['name'] as String?) ?? '',
-      countryCode: (json['sys'] as Map<String, dynamic>?)?['country'] as String? ?? '',
+      countryCode:
+          (json['sys'] as Map<String, dynamic>?)?['country'] as String? ?? '',
     );
   }
 }

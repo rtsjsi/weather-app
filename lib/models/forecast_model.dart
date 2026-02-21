@@ -1,4 +1,3 @@
-/// Daily forecast item from OpenWeatherMap 5-day forecast API
 class ForecastModel {
   final DateTime date;
   final double tempMin;
@@ -20,7 +19,8 @@ class ForecastModel {
 
   factory ForecastModel.fromJson(Map<String, dynamic> json) {
     final main = json['main'] as Map<String, dynamic>? ?? {};
-    final weather = (json['weather'] as List<dynamic>?)?[0] as Map<String, dynamic>? ?? {};
+    final weather =
+        (json['weather'] as List<dynamic>?)?[0] as Map<String, dynamic>? ?? {};
     final wind = json['wind'] as Map<String, dynamic>? ?? {};
     final dt = (json['dt'] as int?) ?? 0;
     final temp = (main['temp'] as num?)?.toDouble();

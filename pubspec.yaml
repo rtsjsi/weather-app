@@ -1,5 +1,5 @@
 name: weather_app
-description: A weather information app for Android and iOS.
+description: A cross-platform weather app for Android, iOS, and Web.
 publish_to: 'none'
 version: 1.0.0+1
 
